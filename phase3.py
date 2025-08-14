@@ -19,7 +19,7 @@ from sklearn.ensemble import RandomForestRegressor
 from xgboost import XGBRegressor
 from sklearn.neural_network import MLPRegressor
 import jdatetime
-
+import openpyxl
 st.title("📊 داشبورد دو فازی پروژه داده‌کاوی")
 phase = st.sidebar.selectbox("انتخاب فاز پروژه:", ["فاز 1", "فاز 2"])
 
