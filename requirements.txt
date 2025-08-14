@@ -1,0 +1,17 @@
+streamlit
+
+pandas
+
+matplotlib
+
+seaborn
+
+scikit-learn
+
+numpy
+
+pyod
+
+xgboost
+
+jdatetime
