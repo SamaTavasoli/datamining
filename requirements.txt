@@ -15,3 +15,5 @@ pyod
 xgboost
 
 jdatetime
+
+openpyxl
