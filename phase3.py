@@ -1,3 +1,24 @@
+import streamlit as st
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import OneHotEncoder, LabelEncoder, StandardScaler
+from sklearn.metrics import mean_squared_error, r2_score, accuracy_score, confusion_matrix, ConfusionMatrixDisplay
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.svm import SVC
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
+from sklearn.ensemble import IsolationForest
+from scipy.stats import zscore
+from pyod.models.knn import KNN
+from sklearn.ensemble import RandomForestRegressor
+from xgboost import XGBRegressor
+from sklearn.neural_network import MLPRegressor
+import jdatetime
 
 st.title("📊 داشبورد دو فازی پروژه داده‌کاوی")
 phase = st.sidebar.selectbox("انتخاب فاز پروژه:", ["فاز 1", "فاز 2"])
