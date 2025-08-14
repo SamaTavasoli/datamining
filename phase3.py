@@ -7,7 +7,6 @@ Original file is located at
     https://colab.research.google.com/drive/1xwsF5gXOjKd9_O1PqcsIqTkTGeoxu4cH
 """
 
-!pip install streamlit pyngrok pandas openpyxl
 
 # Commented out IPython magic to ensure Python compatibility.
 # %%writefile app.py
