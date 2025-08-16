@@ -118,6 +118,7 @@ if phase == "فاز 1":
         plt.title("توزیع خطاها")
         plt.grid(True)
         plt.show()
+        plt.close()
         
         # طبقه‌بندی SVM
         def دسته_سفر(x):
