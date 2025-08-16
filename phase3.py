@@ -117,7 +117,7 @@ if phase == "فاز 1":
         plt.ylabel("تعداد نمونه")
         plt.title("توزیع خطاها")
         plt.grid(True)
-        plt.show()
+        st.pyplot()
         plt.close()
         
         # طبقه‌بندی SVM
