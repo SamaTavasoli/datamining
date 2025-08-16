@@ -19,7 +19,12 @@ from pyod.models.knn import KNN
 import numpy as np
 
 st.title("📊 داشبورد دو فازی پروژه داده‌کاوی")
-phase = st.sidebar.selectbox("انتخاب فاز پروژه:", ["فاز 1", "فاز 2"])
+phase = st.sidebar.selectbox(
+    "انتخاب فاز پروژه:", 
+    ["فاز 1", "فاز 2"],
+    key="phase_select"
+)
+
 
 # ================== فاز 1 ==================
 if phase == "فاز 1":
