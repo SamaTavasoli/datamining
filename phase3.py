@@ -111,13 +111,13 @@ if phase == "فاز 1":
 
         errors = y_test - y_pred
 
-plt.figure(figsize=(8, 4))
-plt.hist(errors, bins=20, color='orange', edgecolor='black')
-plt.xlabel("مقدار خطا (واقعی - پیش‌بینی)")
-plt.ylabel("تعداد نمونه")
-plt.title("توزیع خطاها")
-plt.grid(True)
-plt.show()
+        plt.figure(figsize=(8, 4))
+        plt.hist(errors, bins=20, color='orange', edgecolor='black')
+        plt.xlabel("مقدار خطا (واقعی - پیش‌بینی)")
+        plt.ylabel("تعداد نمونه")
+        plt.title("توزیع خطاها")
+        plt.grid(True)
+        plt.show()
         
         # طبقه‌بندی SVM
         def دسته_سفر(x):
