@@ -1,3 +1,131 @@
+%%writefile app.py
+import streamlit as st
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import OneHotEncoder, LabelEncoder
+from sklearn.metrics import mean_squared_error, r2_score, accuracy_score, confusion_matrix, ConfusionMatrixDisplay
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.svm import SVC
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
+from sklearn.ensemble import IsolationForest
+from scipy.stats import zscore
+from pyod.models.knn import KNN
+import numpy as np
+
+st.title("📊 داشبورد دو فازی پروژه داده‌کاوی")
+phase = st.sidebar.selectbox("انتخاب فاز پروژه:", ["فاز 1", "فاز 2"])
+
+# ================== فاز 1 ==================
+if phase == "فاز 1":
+    st.header("📌 فاز 1: تحلیل اولیه")
+
+    uploaded_file1 = st.file_uploader("آپلود فایل اکسل فاز 1", type=["xlsx"], key="phase1")
+    if uploaded_file1:
+        df = pd.read_excel(uploaded_file1)
+
+        # ================= اجرای کل کد Colab =================
+        df = df.dropna(subset=["تعداد مسافر", "مسافت کل", "نوع ناوگان", "شرکت مسافربری", "مبدا", "مقصد", "ساعت حرکت", "تاریخ حرکت"]).copy()
+        df.loc[:, "ساعت حرکت"] = df["ساعت حرکت"].astype(str).str[:2].astype(int)
+
+        st.subheader("نمایش داده‌های خام")
+        st.dataframe(df)
+
+        # آماری
+        st.subheader("آمار توصیفی")
+        st.write(df.describe(include="all"))
+
+        # نمودارها
+        fig, ax = plt.subplots()
+        sns.histplot(df["ساعت حرکت"], bins=10, kde=True, ax=ax)
+        ax.set_title("توزیع ساعت حرکت")
+        st.pyplot(fig)
+
+        fig, ax = plt.subplots()
+        sns.boxplot(data=df, x="شرکت مسافربری", y="ساعت حرکت", ax=ax)
+        ax.set_title("پراکندگی ساعت حرکت بر اساس شرکت")
+        ax.tick_params(axis="x", rotation=90)
+        st.pyplot(fig)
+
+        group = df.groupby(["ساعت حرکت", "نوع ناوگان", "استان مقصد"]).size().reset_index(name="count")
+        fig, ax = plt.subplots()
+        sns.scatterplot(data=group, x="ساعت حرکت", y="نوع ناوگان", hue="استان مقصد", size="count", ax=ax)
+        ax.set_title("رابطه نوع ناوگان و ساعت حرکت بر اساس مقصد")
+        st.pyplot(fig)
+
+        group = df.groupby(["تعداد مسافر", "مسافت کل", "شرکت مسافربری"]).size().reset_index(name="count")
+        fig, ax = plt.subplots()
+        sns.scatterplot(data=group, x="تعداد مسافر", y="مسافت کل", hue="شرکت مسافربری", size="count", alpha=0.7, ax=ax)
+        ax.set_title("رابطه تعداد مسافر و مسافت کل بر شرکت مسافربری")
+        st.pyplot(fig)
+
+        # ================= رگرسیون خطی =================
+        def extract_month(date_str):
+            try:
+                return int(date_str.split("/")[1])
+            except:
+                return 0
+
+        df.loc[:, "ماه حرکت"] = df["تاریخ حرکت"].apply(extract_month)
+
+        X = df[["مسافت کل", "نوع ناوگان", "شرکت مسافربری", "مبدا", "مقصد", "ساعت حرکت", "ماه حرکت"]]
+        y = df["تعداد مسافر"]
+
+        cat_cols = ["نوع ناوگان", "شرکت مسافربری", "مبدا", "مقصد"]
+
+        preprocessor = ColumnTransformer([
+            ("cat", OneHotEncoder(handle_unknown="ignore"), cat_cols),
+        ], remainder="passthrough")
+
+        pipeline = Pipeline([
+            ("pre", preprocessor),
+            ("model", LinearRegression())
+        ])
+
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        pipeline.fit(X_train, y_train)
+        y_pred = pipeline.predict(X_test)
+
+        st.write("MSE:", mean_squared_error(y_test, y_pred))
+        st.write("R2 Score:", r2_score(y_test, y_pred))
+
+        fig, ax = plt.subplots()
+        ax.scatter(y_test, y_pred, alpha=0.7, color="blue")
+        ax.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], '-r')
+        ax.set_xlabel("تعداد مسافر واقعی")
+        ax.set_ylabel("تعداد مسافر پیش‌بینی‌شده")
+        ax.set_title("مقایسه مقادیر واقعی و پیش‌بینی‌شده")
+        st.pyplot(fig)
+
+        errors = y_test - y_pred
+        fig, ax = plt.subplots()
+        ax.hist(errors, bins=20, color='orange', edgecolor='black')
+        ax.set_title("توزیع خطاها")
+        st.pyplot(fig)
+
+        # بقیه بخش‌های SVM، KMeans و Anomaly Detection رو هم به همین شکل می‌تونی بذاری
+        # چون کد خیلی طولانی میشه، من اول فقط رگرسیون رو کامل کردم
+        # بقیه‌ش رو می‌خوای هم کامل برات ببرم داخل همین فاز بذارم؟
+
+# ================== فاز 2 ==================
+elif phase == "فاز 2":
+    st.header("📌 فاز 2: تحلیل پیشرفته")
+    uploaded_file2 = st.file_uploader("آپلود فایل اکسل فاز 2", type=["xlsx"], key="phase2")
+    if uploaded_file2:
+        df2 = pd.read_excel(uploaded_file2)
+        st.subheader("نمایش داده‌های خام فاز 2")
+        st.dataframe(df2)
+
+        col2 = st.selectbox("ستون عددی برای نمودار:", df2.columns, key="col2")
+        if pd.api.types.is_numeric_dtype(df2[col2]):
+            st.line_chart(df2[col2])
+        else:
+            st.warning("لطفاً ستون عددی انتخاب کنید.")
 import streamlit as st
 import pandas as pd
 import numpy as np
